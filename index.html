@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern, high-end, responsive scientific calculator with a glassmorphism UI, theme toggle, and keyboard support.">
+    <title>NeuraCalc - Glassmorphic Scientific Calculator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Animated Blobs -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Calculator Container -->
+    <main class="calculator-container" aria-label="Scientific Calculator">
+        <!-- Top Toolbar -->
+        <header class="calculator-header">
+            <div class="header-left">
+                <span class="logo">NeuraCalc</span>
+            </div>
+            <div class="header-right">
+                <!-- Angle Mode Toggle (DEG / RAD) -->
+                <button type="button" id="angle-toggle" class="btn-toggle" aria-label="Toggle Angle Mode" title="Toggle between Degrees and Radians">
+                    <span class="active-mode">DEG</span>
+                </button>
+                
+                <!-- Scientific Panel Toggle -->
+                <button type="button" id="sci-toggle" class="btn-toggle" aria-label="Toggle Scientific Mode" title="Toggle Scientific Mode">
+                    <span>SCI</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button type="button" id="theme-toggle" class="btn-toggle icon-btn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
+                    <!-- Sun Icon -->
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                    </svg>
+                    <!-- Moon Icon -->
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Display Screen -->
+        <section class="calculator-screen" aria-live="polite">
+            <div class="screen-wrapper">
+                <div class="expression-display" id="expression-display" aria-label="Current expression"></div>
+                <div class="input-display" id="input-display" aria-label="Input or result">0</div>
+            </div>
+        </section>
+
+        <!-- Keypad Layout -->
+        <section class="keypad-layout">
+            <!-- Scientific Keys Panel -->
+            <div class="scientific-panel" id="scientific-panel" aria-label="Scientific functions">
+                <!-- Row 1: Trig -->
+                <button type="button" class="btn btn-sci" data-action="sin">sin</button>
+                <button type="button" class="btn btn-sci" data-action="cos">cos</button>
+                <button type="button" class="btn btn-sci" data-action="tan">tan</button>
+                <button type="button" class="btn btn-sci" data-action="power">x<sup>y</sup></button>
+
+                <!-- Row 2: Inverse Trig -->
+                <button type="button" class="btn btn-sci btn-sci-inv" data-action="asin">sin<sup>-1</sup></button>
+                <button type="button" class="btn btn-sci btn-sci-inv" data-action="acos">cos<sup>-1</sup></button>
+                <button type="button" class="btn btn-sci btn-sci-inv" data-action="atan">tan<sup>-1</sup></button>
+                <button type="button" class="btn btn-sci btn-sci-inv" data-action="square">x<sup>2</sup></button>
+
+                <!-- Row 3: Other functions -->
+                <button type="button" class="btn btn-sci" data-action="sqrt">√</button>
+                <button type="button" class="btn btn-sci" data-action="log">log</button>
+                <button type="button" class="btn btn-sci" data-action="ln">ln</button>
+                <button type="button" class="btn btn-sci" data-action="open-bracket">(</button>
+
+                <!-- Row 4: Constants & brackets -->
+                <button type="button" class="btn btn-sci" data-action="pi">π</button>
+                <button type="button" class="btn btn-sci" data-action="e">e</button>
+                <button type="button" class="btn btn-sci" data-action="factorial">x!</button>
+                <button type="button" class="btn btn-sci" data-action="close-bracket">)</button>
+            </div>
+
+            <!-- Standard Keys Panel -->
+            <div class="standard-panel">
+                <!-- Row 1 -->
+                <button type="button" class="btn btn-ctrl" data-action="clear">AC</button>
+                <button type="button" class="btn btn-ctrl icon-btn" data-action="delete" aria-label="Delete">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                        <line x1="18" y1="9" x2="12" y2="15"></line>
+                        <line x1="12" y1="9" x2="18" y2="15"></line>
+                    </svg>
+                </button>
+                <button type="button" class="btn btn-ctrl" data-action="percent">%</button>
+                <button type="button" class="btn btn-op" data-action="divide">÷</button>
+
+                <!-- Row 2 -->
+                <button type="button" class="btn btn-num" data-val="7">7</button>
+                <button type="button" class="btn btn-num" data-val="8">8</button>
+                <button type="button" class="btn btn-num" data-val="9">9</button>
+                <button type="button" class="btn btn-op" data-action="multiply">×</button>
+
+                <!-- Row 3 -->
+                <button type="button" class="btn btn-num" data-val="4">4</button>
+                <button type="button" class="btn btn-num" data-val="5">5</button>
+                <button type="button" class="btn btn-num" data-val="6">6</button>
+                <button type="button" class="btn btn-op" data-action="subtract">−</button>
+
+                <!-- Row 4 -->
+                <button type="button" class="btn btn-num" data-val="1">1</button>
+                <button type="button" class="btn btn-num" data-val="2">2</button>
+                <button type="button" class="btn btn-num" data-val="3">3</button>
+                <button type="button" class="btn btn-op" data-action="add">+</button>
+
+                <!-- Row 5 -->
+                <button type="button" class="btn btn-ctrl" data-action="negate">±</button>
+                <button type="button" class="btn btn-num" data-val="0">0</button>
+                <button type="button" class="btn btn-num" data-val=".">.</button>
+                <button type="button" class="btn btn-equals" data-action="equals">=</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Interactive script -->
+    <script src="script.js"></script>
+</body>
+</html>
