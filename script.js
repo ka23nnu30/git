@@ -572,4 +572,100 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => el.classList.remove('keyboard-active'), 120);
         }
     }
+
+    // ---- Math Background Canvas ----
+    (function initMathCanvas() {
+        const canvas = document.getElementById('math-bg-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        // Math symbols pool — equations, Greek letters, operators
+        const SYMBOLS = [
+            'π', 'Σ', '∫', '∞', '√', 'Δ', 'θ', 'λ', 'μ', 'φ', 'ω', 'α', 'β', 'γ',
+            'e²', 'x²', 'f(x)', 'dy/dx', '∂x', '∇', '±', '∴', '≈', '≠', '≤', '≥',
+            'sin', 'cos', 'tan', 'log', 'lim', 'E=mc²', 'a²+b²', 'Σn', '∮', '∝',
+            '∈', '∉', '⊂', '∩', '∪', '∀', '∃', 'ℝ', 'ℕ', 'ℤ', 'ℂ', '⊕',
+            '1+1=2', 'n!', 'xⁿ', '∛x', 'logₙ', 'det(A)', '||v||', 'P(A|B)',
+        ];
+
+        const COLORS_DARK  = ['#3b5bdb', '#1c7ed6', '#0ca678', '#7048e8', '#2b8a3e', '#c92a2a', '#e67700'];
+        const COLORS_LIGHT = ['#4263eb', '#1971c2', '#099268', '#6741d9', '#2f9e44', '#e03131', '#d9480f'];
+
+        let W, H, particles = [];
+
+        function getColors() {
+            return document.documentElement.getAttribute('data-theme') === 'light'
+                ? COLORS_LIGHT : COLORS_DARK;
+        }
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+
+        function spawnParticle(fromScratch) {
+            const colors = getColors();
+            const size   = 10 + Math.random() * 20; // font size px
+            return {
+                x:      fromScratch ? Math.random() * W : W + 60,
+                y:      Math.random() * H,
+                symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+                color:  colors[Math.floor(Math.random() * colors.length)],
+                size,
+                opacity: 0.08 + Math.random() * 0.22,
+                speedX: -(0.12 + Math.random() * 0.38),   // drift left slowly
+                speedY: (Math.random() - 0.5) * 0.18,      // gentle vertical wobble
+                wobbleFreq: 0.002 + Math.random() * 0.006,
+                wobbleAmp:  10   + Math.random() * 30,
+                phase:  Math.random() * Math.PI * 2,
+                angle:  (Math.random() - 0.5) * 0.5,       // slight tilt
+            };
+        }
+
+        function init() {
+            resize();
+            particles = [];
+            const count = Math.min(80, Math.floor((W * H) / 18000));
+            for (let i = 0; i < count; i++) particles.push(spawnParticle(true));
+        }
+
+        let frame = 0;
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            frame++;
+
+            particles.forEach((p, i) => {
+                p.x += p.speedX;
+                p.y += p.speedY + Math.sin(frame * p.wobbleFreq + p.phase) * 0.15;
+
+                // Recycle when off-screen left
+                if (p.x < -120) particles[i] = spawnParticle(false);
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.globalAlpha = p.opacity;
+                ctx.fillStyle   = p.color;
+                ctx.font        = `${p.size}px 'Share Tech Mono', monospace`;
+                ctx.textAlign   = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(p.symbol, 0, 0);
+                ctx.restore();
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', () => { resize(); });
+        init();
+        draw();
+
+        // Re-color on theme toggle
+        themeToggle.addEventListener('click', () => {
+            const colors = getColors();
+            particles.forEach(p => {
+                p.color = colors[Math.floor(Math.random() * colors.length)];
+            });
+        });
+    })();
 });
