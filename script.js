@@ -573,23 +573,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ---- Math Background Canvas ----
+    // ---- Floating Math Formulas Canvas ----
     (function initMathCanvas() {
         const canvas = document.getElementById('math-bg-canvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
 
-        // Math symbols pool — equations, Greek letters, operators
-        const SYMBOLS = [
-            'π', 'Σ', '∫', '∞', '√', 'Δ', 'θ', 'λ', 'μ', 'φ', 'ω', 'α', 'β', 'γ',
-            'e²', 'x²', 'f(x)', 'dy/dx', '∂x', '∇', '±', '∴', '≈', '≠', '≤', '≥',
-            'sin', 'cos', 'tan', 'log', 'lim', 'E=mc²', 'a²+b²', 'Σn', '∮', '∝',
-            '∈', '∉', '⊂', '∩', '∪', '∀', '∃', 'ℝ', 'ℕ', 'ℤ', 'ℂ', '⊕',
-            '1+1=2', 'n!', 'xⁿ', '∛x', 'logₙ', 'det(A)', '||v||', 'P(A|B)',
+        // Full math formulas — famous equations, calculus, algebra, trig
+        const FORMULAS = [
+            // Famous equations
+            'E = mc²',
+            'eⁱᵖ + 1 = 0',
+            'a² + b² = c²',
+            'F = ma',
+            // Calculus
+            'd/dx(xⁿ) = nxⁿ⁻¹',
+            '∫ eˣ dx = eˣ + C',
+            '∫₀^∞ e^(-x²)dx = √π/2',
+            "f'(x) = lim[Δx→0] Δf/Δx",
+            '∂²u/∂t² = c²∇²u',
+            '∇·E = ρ/ε₀',
+            // Algebra & Series
+            'x = (-b ± √(b²-4ac)) / 2a',
+            'Σ 1/n² = π²/6',
+            'Σₙ = n(n+1)/2',
+            'aⁿ + bⁿ ≠ cⁿ  (n>2)',
+            // Trig
+            'sin²θ + cos²θ = 1',
+            'e^(iθ) = cosθ + i·sinθ',
+            'sin(A+B) = sinA·cosB + cosA·sinB',
+            // Physics
+            'PV = nRT',
+            'S = k·ln(Ω)',
+            'ΔE·Δt ≥ ℏ/2',
+            // Probability & Stats
+            'P(A|B) = P(B|A)·P(A)/P(B)',
+            'σ² = Σ(x-μ)²/N',
+            // Linear Algebra
+            'det(AB) = det(A)·det(B)',
+            'Ax = λx',
+            // Symbols
+            '∞', 'π ≈ 3.14159', '√2 ≈ 1.41421',
+            'φ = (1+√5)/2', 'e ≈ 2.71828',
         ];
 
-        const COLORS_DARK  = ['#3b5bdb', '#1c7ed6', '#0ca678', '#7048e8', '#2b8a3e', '#c92a2a', '#e67700'];
-        const COLORS_LIGHT = ['#4263eb', '#1971c2', '#099268', '#6741d9', '#2f9e44', '#e03131', '#d9480f'];
+        // Vivid palette against dark glassmorphism
+        const COLORS_DARK = [
+            '#c084fc', // violet
+            '#60a5fa', // sky blue
+            '#f472b6', // pink
+            '#34d399', // emerald
+            '#fbbf24', // amber
+            '#a78bfa', // purple
+            '#38bdf8', // light blue
+            '#fb7185', // rose
+        ];
+        const COLORS_LIGHT = [
+            '#7c3aed', '#1d4ed8', '#db2777',
+            '#059669', '#d97706', '#6d28d9', '#0369a1',
+        ];
 
         let W, H, particles = [];
 
@@ -605,27 +647,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function spawnParticle(fromScratch) {
             const colors = getColors();
-            const size   = 10 + Math.random() * 20; // font size px
+            // Mix of larger formulas and smaller symbols
+            const isFormula = Math.random() > 0.35;
+            const size = isFormula
+                ? 13 + Math.random() * 14   // 13–27 px for full formulas
+                :  9 + Math.random() * 9;   // 9–18 px for single symbols
+            const color = colors[Math.floor(Math.random() * colors.length)];
             return {
-                x:      fromScratch ? Math.random() * W : W + 60,
-                y:      Math.random() * H,
-                symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
-                color:  colors[Math.floor(Math.random() * colors.length)],
+                x:       fromScratch ? Math.random() * W : W + 200,
+                y:       Math.random() * H,
+                text:    FORMULAS[Math.floor(Math.random() * FORMULAS.length)],
+                color,
                 size,
-                opacity: 0.08 + Math.random() * 0.22,
-                speedX: -(0.12 + Math.random() * 0.38),   // drift left slowly
-                speedY: (Math.random() - 0.5) * 0.18,      // gentle vertical wobble
-                wobbleFreq: 0.002 + Math.random() * 0.006,
-                wobbleAmp:  10   + Math.random() * 30,
+                // More visible: opacity 0.18–0.55
+                opacity: 0.18 + Math.random() * 0.37,
+                speedX: -(0.10 + Math.random() * 0.32),  // slow leftward drift
+                speedY: (Math.random() - 0.5) * 0.14,
+                wobbleFreq: 0.0015 + Math.random() * 0.005,
                 phase:  Math.random() * Math.PI * 2,
-                angle:  (Math.random() - 0.5) * 0.5,       // slight tilt
+                // subtle tilt
+                angle:  (Math.random() - 0.5) * 0.3,
             };
         }
 
         function init() {
             resize();
             particles = [];
-            const count = Math.min(80, Math.floor((W * H) / 18000));
+            const count = Math.min(70, Math.floor((W * H) / 16000));
             for (let i = 0; i < count; i++) particles.push(spawnParticle(true));
         }
 
@@ -636,20 +684,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             particles.forEach((p, i) => {
                 p.x += p.speedX;
-                p.y += p.speedY + Math.sin(frame * p.wobbleFreq + p.phase) * 0.15;
+                p.y += p.speedY + Math.sin(frame * p.wobbleFreq + p.phase) * 0.12;
 
-                // Recycle when off-screen left
-                if (p.x < -120) particles[i] = spawnParticle(false);
+                // Recycle off-screen particles
+                const textW = p.text.length * p.size * 0.62;
+                if (p.x < -textW - 40) particles[i] = spawnParticle(false);
 
                 ctx.save();
                 ctx.translate(p.x, p.y);
                 ctx.rotate(p.angle);
                 ctx.globalAlpha = p.opacity;
-                ctx.fillStyle   = p.color;
-                ctx.font        = `${p.size}px 'Share Tech Mono', monospace`;
-                ctx.textAlign   = 'center';
+
+                // Soft glow halo behind the text
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur  = 14;
+
+                ctx.fillStyle    = p.color;
+                ctx.font         = `${p.size}px 'Share Tech Mono', 'Courier New', monospace`;
+                ctx.textAlign    = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(p.symbol, 0, 0);
+                ctx.fillText(p.text, 0, 0);
+
                 ctx.restore();
             });
 
@@ -660,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
         draw();
 
-        // Re-color on theme toggle
+        // Re-color particles when theme toggles
         themeToggle.addEventListener('click', () => {
             const colors = getColors();
             particles.forEach(p => {
